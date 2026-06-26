@@ -93,7 +93,7 @@ def format(ws:Worksheet):
     ws.add_image(logo, "A1")
     ws.merge_cells("A2:G2")
     ws.row_dimensions[2].height = 95
-    apply_style(ws["A2:H2"], "tb_border")
+    apply_style(ws["A2:HG2"], "tb_border")
     ws["A2"].value = "Перечень сигналов"
     ws["A2"].font = Font(name="Arial", size=14, b=True, color="000000")
     ws["A2"].alignment = Alignment(horizontal="center", vertical="center")

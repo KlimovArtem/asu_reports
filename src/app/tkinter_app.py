@@ -1,35 +1,59 @@
 from tkinter import *
-from tkinter import ttk
+from tkinter.ttk import * 
 
 root = Tk()
 
-root.title("Отчёты отдела АСУ")
-root.columnconfigure(0, weight=1)
-root.rowconfigure(0, weight=1)
+data = {
+    "input_quantity": IntVar(),
+    "control_signals": BooleanVar(),
+    "io_modul_type": StringVar()
+}
 
-form = ttk.Frame(root, padding=20)
-form.columnconfigure(2, weight=1)
-form.grid(column=0, row=0, sticky=(N, W, E, S))
+def checkbutton_changed():
+    if  data["control_signals"].get():
+        io_modul_type_lbl.grid(row=2, column=0, sticky=W)
+        io_modul_type = grid(row=3, column=0, sticky=W)
+    else:
+        io_modul_type_lbl.grid_forget()
+        io_modul_type.grid_forget()
 
-ttk.Label(form, text="Перечень сигналов").grid(column=1, row=0, sticky=(N, ))
+root.title("Tkinter Sample")
 
-input_info_fieldset = ttk.Frame(form, padding=10)
-input_info_fieldset.grid(column=1, row=1)
+w, h = 300, 200
+x = (root.winfo_screenwidth() - w) // 2
+y = 60
+root.geometry(f"{w}x{h}+{x}+{y}")
 
-ttk.Label(input_info_fieldset, text="Колличество вводов:").grid(column=1, row=1, sticky=W)
+form = Frame(root)
+form.grid(row=0, column=0, padx=10, pady=10)
+form.columnconfigure(index=0, weight=1)
 
-av_quantity = StringVar()
-av_quantity_entry = ttk.Entry(input_info_fieldset, textvariable=av_quantity)
-av_quantity_entry.grid(column=1, row=2, sticky=W)
+Label(form, text="Перечень сигналов").grid(row=0, column=0, sticky=(W, E))
 
-for child in form.winfo_children(): 
-    for subchild in child.winfo_children():
-        subchild.grid_configure(pady=2)
+input_fieldset = Frame(form)
+input_fieldset.grid(row=1, column=0)
 
-av_quantity_entry.focus()
+Label(input_fieldset, text="Количество вводов:").grid(row=0, column=0, sticky=W)
+input_quantity_entry = Spinbox(input_fieldset, from_=0, to=100, increment=1,  width=4, textvariable=data["input_quantity"])
+input_quantity_entry.grid(row=0, column=1)
 
+# Label(input_fieldset, text="Управление").grid(row=1, column=0, sticky=W)
+control_signals_checkbox = Checkbutton(
+    input_fieldset, text="Управление",
+    offvalue=False,
+    onvalue=True,
+    variable=data["control_signals"],
+    command=checkbutton_changed
+)
+control_signals_checkbox.grid(row=1, column=0, sticky=W)
 
-ttk.Button(form, text="Сформировать").grid(column=1, sticky=S)
+io_modul_type_lbl = Label(input_fieldset, text="Тип I/O оборудования:")
+io_modul_type = Combobox(
+    input_fieldset,
+    values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"],
+    textvariable=data["io_modul_type"]
+)
+    
 
 
 
