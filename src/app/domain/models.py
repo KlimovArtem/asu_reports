@@ -1,5 +1,4 @@
 from dataclasses import dataclass
-from enum import Enum
 from pathlib import Path
 from typing import Any
 
@@ -55,14 +54,14 @@ class BaseReport(interfaces.ReportInterface):
 
     def __init__(self, title: str = ""):
         self.title: str = title
-        self.data: Any = None
+        self.content: Any = None
         
         
 
 class XLSReport(BaseReport):
     def __init__(self, title: str):
         super().__init__(title=title)
-        self.data: Workbook = Workbook()
+        self.content: Workbook = Workbook()
     
     def format(self):
         pass
@@ -99,10 +98,9 @@ class SignalsList(XLSReport):
         ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
 
     def generate(self, data: RequestData):
-        wb = self.data
-        wb.add_named_style(normalize)
-        wb.add_named_style(tb_border)
-        ws = wb.active
+        self.content.add_named_style(normalize)
+        self.content.add_named_style(tb_border)
+        ws = self.content.active
         ws.append(
             [
                 "№ п/п",
@@ -205,7 +203,7 @@ class SignalsList(XLSReport):
         self.format(ws)
 
     def save(self, path: Path | str):
-        self.data.save(path / f"{self.title}.xlsx")
+        self.content.save(path / f"{self.title}.xlsx")
 
 
 if __name__ == "__main__":

@@ -6,4 +6,7 @@ class ReportService:
         self._report: ReportInterface = report_type()
     
     def generate_report(self, data):
-        
+        return self._report.generate(data)
+
+    def save(self, path):
+        return self._report.save(path)
