@@ -3,9 +3,8 @@ from tkinter.ttk import *
 
 
 class SignalsListView(Frame):
-    def __init__(self, parent):
-        super().__init__(parent)
-
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent, *args, **kwargs)
         self.form_data = {
             "system": StringVar(),
             "supplys": {
@@ -26,28 +25,31 @@ class SignalsListView(Frame):
             }
         }
 
-        self.padding = 10
-        
         # Заголовок формы
-        Label(self, text="Перечень сигналов").pack(fill="x", expand=True, padx=10, pady=5)
+        Label(self, text="Перечень сигналов").grid(row=1, column=1, pady=15, sticky=(W, E))
 
         # Система. Полле ввода с лейблом 
-        Label(self, text="Объект:").pack(fill="x", expand=True, padx=3, pady=5)
-        Entry(self, textvariable=self.form_data["system"]).pack(fill="x", expand=True, padx=3, pady=5)
+        Label(self, text="Объект:").grid(row=2, column=1, sticky=(W, E))
+        system_entry = Entry(self, textvariable=self.form_data["system"])
+        system_entry.configure(style="TEntry")
+        system_entry.grid(row=3, column=1, pady=10, sticky=(W, E))
 
         # Ввод. Фиелдсет
         supplys_fldset = LabelFrame(self, text="Ввод", padding=10)
-        supplys_fldset.pack(fill="both", expand=True)
+        supplys_fldset.grid(row=4, column=1, pady=5, sticky=(W, E))
+        supplys_fldset.columnconfigure(index=1, weight=3)
+        supplys_fldset.columnconfigure(index=2, weight=1)
+        # [supplys_fldset.rowconfigure(index=r, weight=1)for r in range(2)]
 
         ## Ввод. Кол-во вводов Полле ввода с лейблом 
-        Label(supplys_fldset, text="Количество вводов:").grid(row=1, column=1, padx=3, pady=5)
-        supplys_quantity_etry = Spinbox(supplys_fldset, from_=0, to=100, increment=1,  width=4, textvariable=self.form_data["supplys"]["quantity"])
-        supplys_quantity_etry.grid(row=1, column=2, padx=3, pady=5)
+        Label(supplys_fldset, text="Количество вводов:").grid(row=1, column=1, padx=3, pady=5, sticky=(W, N, S))
+        supplys_quantity_etry = Spinbox(supplys_fldset, from_=0, to=100, increment=1,  width=6, textvariable=self.form_data["supplys"]["quantity"])
+        supplys_quantity_etry.grid(row=1, column=2, padx=3, pady=5, sticky=E)
 
         ## Ввод. Сигналы сигнализации. Полле ввода с лейблом 
-        Label(supplys_fldset, text="Тип I/O оборудования (DI):").grid(row=2, column=1, padx=3, pady=5)
+        Label(supplys_fldset, text="Тип I/O оборудования (DI):").grid(row=2, column=1, columnspan=2,  padx=3, pady=5, sticky=(W, E))
         supplys_input_signals_etry = Combobox(supplys_fldset, values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"], textvariable=self.form_data["supplys"]["di_module_type"])
-        supplys_input_signals_etry.grid(row=3, column=1, padx=3, pady=5)
+        supplys_input_signals_etry.grid(row=3, column=1, columnspan=2, padx=3, pady=5, sticky=(W, E))
 
         ## Ввод. Сигналы управления. Полле ввода с лейблом
         supplys_control_lbl = Label(supplys_fldset, text="Тип I/O оборудования (DO):")
@@ -70,7 +72,7 @@ class SignalsListView(Frame):
                 start_row=5
             )
         )
-        supplys_control_chkbox.grid(row=4, column=1, pady=3)
+        supplys_control_chkbox.grid(row=4, column=1, pady=3, sticky=(W, E))
 
         ## Ввод. Измерения. Полле ввода с лейблом
         supplys_measurements_lbl = Label(supplys_fldset, text="Тип средства измерений (AI):")
@@ -93,21 +95,23 @@ class SignalsListView(Frame):
                 start_row=8
             )
         )
-        supplys_measurements_chkbox.grid(row=7, column=1, pady=3)
+        supplys_measurements_chkbox.grid(row=7, column=1, pady=3, sticky=(W, E))
 
         # Отходящие линии. Фиелдсет
         feeders_fldset = LabelFrame(self, text="Отходящие линии", padding=10)
-        feeders_fldset.pack(fill="both", expand=True)
+        feeders_fldset.grid(row=5, column=1, pady=5, sticky=(W, E))
+        feeders_fldset.columnconfigure(index=1, weight=3)
+        feeders_fldset.columnconfigure(index=2, weight=1)
 
         ## Отходящие линии. Кол-во вводов Полле ввода с лейблом
-        Label(feeders_fldset, text="Количество ОЛ:").grid(row=1, column=1, padx=3, pady=5)
+        Label(feeders_fldset, text="Количество ОЛ:").grid(row=1, column=1, padx=3, pady=5, sticky=(W, E))
         feeders_quantity_etry = Spinbox(feeders_fldset, from_=0, to=100, increment=1,  width=4, textvariable=self.form_data["feeders"]["quantity"])
-        feeders_quantity_etry.grid(row=1, column=2, padx=3, pady=5)
+        feeders_quantity_etry.grid(row=1, column=2, padx=3, pady=5, sticky=(W, E))
 
         ## Отходящие линии. Сигналы сигнализации. Полле ввода с лейблом 
-        Label(feeders_fldset, text="Тип I/O оборудования (DI):").grid(row=2, column=1, padx=3, pady=5)
+        Label(feeders_fldset, text="Тип I/O оборудования (DI):").grid(row=2, column=1, columnspan=2, padx=3, pady=5, sticky=(W, E))
         feeders_input_signals_etry = Combobox(feeders_fldset,  values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"], textvariable=self.form_data["feeders"]["di_module_type"])
-        feeders_input_signals_etry.grid(row=3, column=1, padx=3, pady=5)
+        feeders_input_signals_etry.grid(row=3, column=1, columnspan=2, padx=3, pady=5, sticky=(W, E))
 
         ## Отходящие линии. Сигналы управления. Полле ввода с лейблом
         feeders_control_lbl = Label(feeders_fldset, text="Тип I/O оборудования (DO):")
@@ -130,7 +134,7 @@ class SignalsListView(Frame):
                 start_row=5
             )
         )
-        feeders_control_chkbox.grid(row=4, column=1, pady=3)
+        feeders_control_chkbox.grid(row=4, column=1, pady=3, sticky=(W, E))
 
         ## Отходящие линии. Измерения. Полле ввода с лейблом
         feeders_measurements_lbl = Label(supplys_fldset, text="Тип средства измерений (AI):")
@@ -153,16 +157,16 @@ class SignalsListView(Frame):
                 start_row=8
             )
         )
-        feeders_measurements_chkbox.grid(row=7, column=1, pady=3)
+        feeders_measurements_chkbox.grid(row=7, column=1, pady=3, sticky=(W, E))
 
         accept_button = Button(self, text="Отправить", command=self.send_form_data)
-        accept_button.pack(fill="x", expand=True, padx=10, pady=10)
+        accept_button.grid(row=6, column=1, sticky=(W, E))
 
     def hide_show_widget(self, callback_flag, widgets:list, start_row: int):
         if callback_flag.get():
             for offset, widget in enumerate(widgets):
                 row_num = start_row+offset
-                widget.grid(row=row_num, column=1, padx=3, pady=5)
+                widget.grid(row=row_num, column=1, columnspan=2, padx=3, pady=5, sticky=(W, E))
         else:
             for widget in widgets:
                 widget.grid_forget()
