@@ -3,13 +3,12 @@ from tkinter.ttk import *
 
 from app.domain.models import FormData, RequestData
 from app.presentation.views import SignalsListView
+from app.presentation.styles import init_fonts
+
 
 class App(Tk):
     def __init__(self):
         super().__init__()
-        Style().configure(".",  font="helvetica 14", foreground="#262626", background="#fbfbfb")
-        Style().configure("ReportApp.TEntry", padding=(3,2), borderwidth=5, bordercolor="blue")
-
         self.title = "Отчёты АСУ"
         self.resizable(False, False)
         self.minsize(400, 1)
@@ -22,5 +21,12 @@ class App(Tk):
 if __name__ == "__main__":
     app = App()
     style = Style(app)
-    style.configure("TEntry", padding=3, borderwidth=5, bordercolor="blue")
+    style.theme_use('clam')
+    fonts = init_fonts(app)
+    style.configure(".",  font=fonts.get("main_font"), foreground="#262626", background="#fbfbfb")
+    style.configure("Header.TLabel", font=fonts.get("header_font"))
+    style.configure("ReportApp.TEntry", padding=(3, 5))
+    style.configure('ReportApp.TSpinbox', padding=(3, 5), arrowsize=16, arrowcolor='#262626')
+    style.configure('ReportApp.TCombobox', padding=(3, 5), arrowsize=16, arrowcolor='#262626')
+    style.configure("ReportApp.TButton", font=fonts.get("main_font"), padding=5)
     app.mainloop()

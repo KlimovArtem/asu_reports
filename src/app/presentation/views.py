@@ -1,10 +1,13 @@
 from tkinter import *
-from tkinter.ttk import * 
+from tkinter.ttk import *
+
+from app.presentation.styles import init_fonts
 
 
 class SignalsListView(Frame):
     def __init__(self, parent, *args, **kwargs):
         super().__init__(parent, *args, **kwargs)
+        fonts = init_fonts(parent)
         self.form_data = {
             "system": StringVar(),
             "supplys": {
@@ -26,12 +29,11 @@ class SignalsListView(Frame):
         }
 
         # Заголовок формы
-        Label(self, text="Перечень сигналов").grid(row=1, column=1, pady=15, sticky=(W, E))
+        Label(self, text="Перечень сигналов", style="Header.TLabel").grid(row=1, column=1, pady=15, sticky=(N, ))
 
         # Система. Полле ввода с лейблом 
         Label(self, text="Объект:").grid(row=2, column=1, sticky=(W, E))
-        system_entry = Entry(self, textvariable=self.form_data["system"])
-        system_entry.configure(style="TEntry")
+        system_entry = Entry(self, textvariable=self.form_data["system"], font=fonts.get("main_font"), style="ReportApp.TEntry")
         system_entry.grid(row=3, column=1, pady=10, sticky=(W, E))
 
         # Ввод. Фиелдсет
@@ -43,12 +45,27 @@ class SignalsListView(Frame):
 
         ## Ввод. Кол-во вводов Полле ввода с лейблом 
         Label(supplys_fldset, text="Количество вводов:").grid(row=1, column=1, padx=3, pady=5, sticky=(W, N, S))
-        supplys_quantity_etry = Spinbox(supplys_fldset, from_=0, to=100, increment=1,  width=6, textvariable=self.form_data["supplys"]["quantity"])
+        supplys_quantity_etry = Spinbox(
+            supplys_fldset,
+            from_=0,
+            to=100,
+            increment=1, 
+            width=6,
+            textvariable=self.form_data["supplys"]["quantity"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TSpinbox"
+        )
         supplys_quantity_etry.grid(row=1, column=2, padx=3, pady=5, sticky=E)
 
         ## Ввод. Сигналы сигнализации. Полле ввода с лейблом 
         Label(supplys_fldset, text="Тип I/O оборудования (DI):").grid(row=2, column=1, columnspan=2,  padx=3, pady=5, sticky=(W, E))
-        supplys_input_signals_etry = Combobox(supplys_fldset, values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"], textvariable=self.form_data["supplys"]["di_module_type"])
+        supplys_input_signals_etry = Combobox(
+            supplys_fldset,
+            values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"],
+            textvariable=self.form_data["supplys"]["di_module_type"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TCombobox"
+        )
         supplys_input_signals_etry.grid(row=3, column=1, columnspan=2, padx=3, pady=5, sticky=(W, E))
 
         ## Ввод. Сигналы управления. Полле ввода с лейблом
@@ -56,7 +73,9 @@ class SignalsListView(Frame):
         supplys_control_etry = Combobox(
             supplys_fldset,
             values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"],
-            textvariable=self.form_data["supplys"]["do_module_type"]
+            textvariable=self.form_data["supplys"]["do_module_type"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TCombobox"
         )
 
         ## Ввод. Сигналы управления. Чекбокс
@@ -79,7 +98,9 @@ class SignalsListView(Frame):
         supplys_measurements_etry = Combobox(
             supplys_fldset,
             values=["ЭНИП-2", "АИРИС-МИ-120", "СЭТ-4"],
-            textvariable=self.form_data["supplys"]["ai_module_type"]
+            textvariable=self.form_data["supplys"]["ai_module_type"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TCombobox"
         )
 
         ## Ввод. Измерения. Чекбокс
@@ -105,12 +126,27 @@ class SignalsListView(Frame):
 
         ## Отходящие линии. Кол-во вводов Полле ввода с лейблом
         Label(feeders_fldset, text="Количество ОЛ:").grid(row=1, column=1, padx=3, pady=5, sticky=(W, E))
-        feeders_quantity_etry = Spinbox(feeders_fldset, from_=0, to=100, increment=1,  width=4, textvariable=self.form_data["feeders"]["quantity"])
+        feeders_quantity_etry = Spinbox(
+            feeders_fldset,
+            from_=0,
+            to=100,
+            increment=1, 
+            width=4,
+            textvariable=self.form_data["feeders"]["quantity"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TSpinbox"
+        )
         feeders_quantity_etry.grid(row=1, column=2, padx=3, pady=5, sticky=(W, E))
 
         ## Отходящие линии. Сигналы сигнализации. Полле ввода с лейблом 
         Label(feeders_fldset, text="Тип I/O оборудования (DI):").grid(row=2, column=1, columnspan=2, padx=3, pady=5, sticky=(W, E))
-        feeders_input_signals_etry = Combobox(feeders_fldset,  values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"], textvariable=self.form_data["feeders"]["di_module_type"])
+        feeders_input_signals_etry = Combobox(
+            feeders_fldset, 
+            values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"],
+            textvariable=self.form_data["feeders"]["di_module_type"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TCombobox"
+        )
         feeders_input_signals_etry.grid(row=3, column=1, columnspan=2, padx=3, pady=5, sticky=(W, E))
 
         ## Отходящие линии. Сигналы управления. Полле ввода с лейблом
@@ -118,7 +154,9 @@ class SignalsListView(Frame):
         feeders_control_etry = Combobox(
             feeders_fldset,
             values=["ЭНМВ-1", "АИРИС-МИ-120", "ТОР200"],
-            textvariable=self.form_data["feeders"]["do_module_type"]
+            textvariable=self.form_data["feeders"]["do_module_type"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TCombobox"
         )
 
         ## Отходящие линии. Сигналы управления. Чекбокс
@@ -141,7 +179,9 @@ class SignalsListView(Frame):
         feeders_measurements_etry = Combobox(
             feeders_fldset,
             values=["ЭНИП-2", "АИРИС-МИ-120", "СЭТ-4"],
-            textvariable=self.form_data["feeders"]["ai_module_type"]
+            textvariable=self.form_data["feeders"]["ai_module_type"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TCombobox"
         )
 
         ## Отходящие линии. Измерения. Чекбокс
@@ -159,7 +199,7 @@ class SignalsListView(Frame):
         )
         feeders_measurements_chkbox.grid(row=7, column=1, pady=3, sticky=(W, E))
 
-        accept_button = Button(self, text="Отправить", command=self.send_form_data)
+        accept_button = Button(self, text="Отправить", command=self.send_form_data, style="ReportApp.TButton")
         accept_button.grid(row=6, column=1, sticky=(W, E))
 
     def hide_show_widget(self, callback_flag, widgets:list, start_row: int):

@@ -1,11 +1,10 @@
-from tkinter import ttk
+import tkinter as tk
+from tkinter import font as tk_fonts
 
 
-custom_frame = ttk.Style()
-custom_frame.configure(
-    "ReportsApp.TFrame",
-    background="#262626",
-    foreground="#fbfbfbfb",
-    font="Helvetica 14",
-    padding=10
-)
+
+def init_fonts(app: tk.Tk):
+    return {
+        "main_font": tk_fonts.Font(family="Helvetica", size=12),
+        "header_font": tk_fonts.Font(family="Helvetica", size=14, weight="bold")
+    }
