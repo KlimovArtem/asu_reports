@@ -2,6 +2,7 @@ from tkinter import *
 from tkinter.ttk import *
 
 from app.presentation.styles import init_fonts
+from app.presentation.serializers import SignalsListSubdataSerializer
 
 
 class SignalsListView(Frame):
@@ -41,7 +42,6 @@ class SignalsListView(Frame):
         supplys_fldset.grid(row=4, column=1, pady=5, sticky=(W, E))
         supplys_fldset.columnconfigure(index=1, weight=3)
         supplys_fldset.columnconfigure(index=2, weight=1)
-        # [supplys_fldset.rowconfigure(index=r, weight=1)for r in range(2)]
 
         ## Ввод. Кол-во вводов Полле ввода с лейблом 
         Label(supplys_fldset, text="Количество вводов:").grid(row=1, column=1, padx=3, pady=5, sticky=(W, N, S))
@@ -89,7 +89,8 @@ class SignalsListView(Frame):
                 callback_flag=self.form_data["supplys"]["control"],
                 widgets=[supplys_control_lbl, supplys_control_etry],
                 start_row=5
-            )
+            ),
+            style="ReportApp.TCheckbutton"
         )
         supplys_control_chkbox.grid(row=4, column=1, pady=3, sticky=(W, E))
 
@@ -114,7 +115,8 @@ class SignalsListView(Frame):
                 callback_flag=self.form_data["supplys"]["measurements"],
                 widgets=[supplys_measurements_lbl, supplys_measurements_etry],
                 start_row=8
-            )
+            ),
+            style="ReportApp.TCheckbutton"
         )
         supplys_measurements_chkbox.grid(row=7, column=1, pady=3, sticky=(W, E))
 
@@ -170,7 +172,8 @@ class SignalsListView(Frame):
                 callback_flag=self.form_data["feeders"]["control"],
                 widgets=[feeders_control_lbl, feeders_control_etry],
                 start_row=5
-            )
+            ),
+            style="ReportApp.TCheckbutton"
         )
         feeders_control_chkbox.grid(row=4, column=1, pady=3, sticky=(W, E))
 
@@ -195,7 +198,8 @@ class SignalsListView(Frame):
                 callback_flag=self.form_data["feeders"]["measurements"],
                 widgets=[feeders_measurements_lbl, feeders_measurements_etry],
                 start_row=8
-            )
+            ),
+            style="ReportApp.TCheckbutton"
         )
         feeders_measurements_chkbox.grid(row=7, column=1, pady=3, sticky=(W, E))
 
@@ -212,9 +216,10 @@ class SignalsListView(Frame):
                 widget.grid_forget()
     
     def send_form_data(self):
-        print(
-            {
-                key: {key:subvalue for key, subvalue in value.items()} if isinstance(value, dict) else value
-                for key, value in self.form_data.items()
-            }
-        )
+        form_data = {
+            key: {key:subvalue.get() for key, subvalue in value.items()} if isinstance(value, dict) else value.get()
+            for key, value in self.form_data.items()
+        }
+        print(form_data)
+        serialized_data = SignalsListSubdataSerializer(**form_data)
+        print(serialized_data)

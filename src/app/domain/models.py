@@ -31,25 +31,6 @@ MESURMENT_SIGNALS = [
 ]
 
 
-@dataclass
-class FormData:
-    quantity: int
-    control_signals: bool = False
-    io_module_type: str = ""
-    measurements: bool = False
-    measurement_module_type: str = ""
-    
-@dataclass
-class RequestData:
-    system: str
-    input: FormData
-    output: FormData
-    sectioning: FormData | None = None
-
-
-
-
-
 class BaseReport(interfaces.ReportInterface):
 
     def __init__(self, title: str = ""):
@@ -66,7 +47,7 @@ class XLSReport(BaseReport):
     def format(self):
         pass
     
-    def generate(self, data: RequestData):
+    def generate(self, data):
         pass
 
     def save(self, path):
@@ -76,6 +57,21 @@ class XLSReport(BaseReport):
 
 class SignalsList(XLSReport):
 
+    @dataclass
+    class SignalsListSubdata:
+        quantity: int = 0
+        di_module_type: str = ""
+        control: bool = False
+        do_module_type: str= ""
+        measurements: bool = False
+        ai_module_type: str = ""
+
+    @dataclass
+    class SignalsListData:
+        system: str
+        supplys: SignalsListSubdata
+        feeders: SignalsListSubdata
+    
     def format(self, ws:Worksheet):
         ws.insert_rows(1, 2)
         ws.merge_cells("A1:G1")
@@ -97,7 +93,7 @@ class SignalsList(XLSReport):
         ws["A2"].font = Font(name="Arial", size=14, b=True, color="000000")
         ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
 
-    def generate(self, data: RequestData):
+    def generate(self, data: SignalsListData):
         self.content.add_named_style(normalize)
         self.content.add_named_style(tb_border)
         ws = self.content.active
@@ -208,11 +204,5 @@ class SignalsList(XLSReport):
 
 if __name__ == "__main__":
     signals_list_example = SignalsList(title="Пример отчёта")
-    data = RequestData(
-        system="НКУ",
-        input=FormData(quantity=2, control_signals=True, io_module_type="ЭНМВ-1", measurements=True, measurement_module_type="ЭНИП-2"),
-        output=FormData(quantity=10, io_module_type="ЭНМВ-1", measurements=False),
-        sectioning=None
-    )
-    signals_list_example.generate(data)
+    data = signals_list_example.SignalsListData()
     signals_list_example.save(APP_DIR.parent.parent / "temp")

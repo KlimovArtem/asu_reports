@@ -1,6 +1,9 @@
 import tkinter as tk
+from tkinter import ttk
 from tkinter import font as tk_fonts
 
+
+from app.settings import STATIC_DIR
 
 
 def init_fonts(app: tk.Tk):
