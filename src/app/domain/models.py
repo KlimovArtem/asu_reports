@@ -2,20 +2,32 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
-from app.domain import interfaces
-from app.settings import STATIC_DIR
-
 from openpyxl import Workbook
 from openpyxl.drawing.image import Image
 from openpyxl.cell.text import InlineFont
 from openpyxl.cell.rich_text import TextBlock, CellRichText
 from openpyxl.styles import Alignment, Font
 from openpyxl.worksheet.worksheet import Worksheet
+from pydantic import BaseModel, Field
 
-
+from app.domain import interfaces
 from app.settings import APP_DIR, STATIC_DIR
 from app.utils.tkinter_utils import adjust_col_width, apply_style, normalize, tb_border
 
+
+class SignalsListSubdata(BaseModel):
+    quantity: int
+    di_module_type: str
+    control: bool
+    do_module_type: str
+    measurements: bool
+    ai_module_type: str
+
+
+class SignalsListData(BaseModel):
+    system: str
+    supplys: SignalsListSubdata
+    feeders: SignalsListSubdata
 
 CONTROL_COMANDS = ["Команда включить", "Команда отключить"]
 INPUT_SIGNALS = [
@@ -36,6 +48,7 @@ class BaseReport(interfaces.ReportInterface):
     def __init__(self, title: str = ""):
         self.title: str = title
         self.content: Any = None
+        self.data_scheme: BaseModel | None = None
         
         
 
@@ -56,23 +69,11 @@ class XLSReport(BaseReport):
 
 
 class SignalsList(XLSReport):
+    def __init__(self, title: str):
+        super().__init__(title=title)
+        self.data_scheme = SignalsListData
 
-    @dataclass
-    class SignalsListSubdata:
-        quantity: int = 0
-        di_module_type: str = ""
-        control: bool = False
-        do_module_type: str= ""
-        measurements: bool = False
-        ai_module_type: str = ""
-
-    @dataclass
-    class SignalsListData:
-        system: str
-        supplys: SignalsListSubdata
-        feeders: SignalsListSubdata
-    
-    def format(self, ws:Worksheet):
+    def format(self, ws:Worksheet) -> None:
         ws.insert_rows(1, 2)
         ws.merge_cells("A1:G1")
         ws.row_dimensions[1].height = 117
@@ -93,7 +94,7 @@ class SignalsList(XLSReport):
         ws["A2"].font = Font(name="Arial", size=14, b=True, color="000000")
         ws["A2"].alignment = Alignment(horizontal="center", vertical="center")
 
-    def generate(self, data: SignalsListData):
+    def generate(self, data: SignalsListData) -> None:
         self.content.add_named_style(normalize)
         self.content.add_named_style(tb_border)
         ws = self.content.active
@@ -109,8 +110,8 @@ class SignalsList(XLSReport):
             ]
         )
         row_counter = 0
-        for i in range(1, data.input.quantity + 1):
-            if data.input.control_signals:
+        for i in range(1, data.supplys.quantity + 1):
+            if data.supplys.control:
                 for comand in CONTROL_COMANDS:
                     row_counter += 1
                     ws.append(
@@ -119,7 +120,7 @@ class SignalsList(XLSReport):
                             data.system,
                             f"Ввод {i}",
                             comand,
-                            data.input.io_module_type,
+                            data.supplys.do_module_type,
                             "ТУ",
                             ""
                         ]
@@ -132,12 +133,12 @@ class SignalsList(XLSReport):
                         data.system,
                         f"Ввод {i}",
                         signal,
-                        data.input.io_module_type,
+                        data.supplys.di_module_type,
                         "ТС",
                         ""
                     ]
                 )
-            if data.input.measurements:
+            if data.supplys.measurements:
                 for signal in MESURMENT_SIGNALS:
                     row_counter += 1
                     ws.append(
@@ -146,14 +147,14 @@ class SignalsList(XLSReport):
                             data.system,
                             f"Ввод {i}",
                             signal,
-                            data.input.measurement_module_type,
+                            data.supplys.ai_module_type,
                             "ТИ",
                             ""
                         ]
                     )
                 
-        for i in range(1, data.output.quantity + 1 ):
-            if data.output.control_signals:
+        for i in range(1, data.feeders.quantity + 1 ):
+            if data.feeders.control:
                 for comand in CONTROL_COMANDS:
                     row_counter += 1
                     ws.append(
@@ -162,7 +163,7 @@ class SignalsList(XLSReport):
                             data.system,
                             f"ОЛ {i}",
                             comand,
-                            data.output.io_modul_type,
+                            data.feeders.do_module_type,
                             "ТУ",
                             ""
                         ]
@@ -175,12 +176,12 @@ class SignalsList(XLSReport):
                         data.system,
                         f"ОЛ {i}",
                         signal,
-                        data.output.io_module_type,
+                        data.feeders.di_module_type,
                         "ТС",
                         ""
                     ]
                 )
-            if data.output.measurements:
+            if data.feeders.measurements:
                 for signal in MESURMENT_SIGNALS:
                     row_counter += 1
                     ws.append(
@@ -189,7 +190,7 @@ class SignalsList(XLSReport):
                             data.system,
                             f"ОЛ {i}",
                             signal,
-                            data.output.measurement_module_type,
+                            data.feeders.ai_module_type,
                             "ТИ",
                             ""
                         ]
@@ -198,11 +199,10 @@ class SignalsList(XLSReport):
         adjust_col_width(ws)
         self.format(ws)
 
-    def save(self, path: Path | str):
+    def save(self, path: Path | str) -> None:
         self.content.save(path / f"{self.title}.xlsx")
 
 
 if __name__ == "__main__":
     signals_list_example = SignalsList(title="Пример отчёта")
-    data = signals_list_example.SignalsListData()
     signals_list_example.save(APP_DIR.parent.parent / "temp")

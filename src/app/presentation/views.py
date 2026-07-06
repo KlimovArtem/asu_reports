@@ -1,30 +1,53 @@
 from tkinter import *
 from tkinter.ttk import *
+from tkinter import filedialog
 
+from app.application.services import ReportService
 from app.presentation.styles import init_fonts
-from app.presentation.serializers import SignalsListSubdataSerializer
+from app.presentation.serializers import SignalsListDataSerializer
+from app.settings import APP_DIR
+
+
+
+class ChoosenReportTypeView(Frame):
+    def __init__(self, parent, *args, **kwargs):
+        super().__init__(parent, padding=15, *args, **kwargs)
+        fonts = init_fonts(parent)
+        Label(self, text="Выбери тип отчёта", style="Header.TLabel").grid(row=1, column=1, pady=15, sticky=(N,))
+        report_type = Combobox(
+            self,
+            values=["Перечень сигналов"],
+            font=fonts.get("main_font"),
+            style="ReportApp.TCombobox"
+        )
+        report_type.grid(row=2, column=1,  pady=10, sticky=(W, E))
+        Button(self, text="Дальше",
+               command=lambda: parent.show_view(url=report_type.get()),
+               style="ReportApp.TButton"
+        ).grid(row=3, column=1, pady=10, sticky=(W, E))
 
 
 class SignalsListView(Frame):
     def __init__(self, parent, *args, **kwargs):
-        super().__init__(parent, *args, **kwargs)
+        super().__init__(parent, padding=15, *args, **kwargs)
+        self.report_service = ReportService("signals list")
         fonts = init_fonts(parent)
         self.form_data = {
             "system": StringVar(),
             "supplys": {
-                "quantity": IntVar(),
+                "quantity": IntVar(value=0),
                 "di_module_type": StringVar(),
-                "control": BooleanVar(),
+                "control": BooleanVar(value=False),
                 "do_module_type": StringVar(),
-                "measurements": BooleanVar(),
+                "measurements": BooleanVar(value=False),
                 "ai_module_type": StringVar(),
             },
             "feeders": {
-                "quantity": IntVar(),
+                "quantity": IntVar(value=0),
                 "di_module_type": StringVar(),
-                "control": BooleanVar(),
+                "control": BooleanVar(value=False),
                 "do_module_type": StringVar(),
-                "measurements": BooleanVar(),
+                "measurements": BooleanVar(value=False),
                 "ai_module_type": StringVar(),
             }
         }
@@ -203,7 +226,7 @@ class SignalsListView(Frame):
         )
         feeders_measurements_chkbox.grid(row=7, column=1, pady=3, sticky=(W, E))
 
-        accept_button = Button(self, text="Отправить", command=self.send_form_data, style="ReportApp.TButton")
+        accept_button = Button(self, text="Отправить", command=self.processing_form_data, style="ReportApp.TButton")
         accept_button.grid(row=6, column=1, sticky=(W, E))
 
     def hide_show_widget(self, callback_flag, widgets:list, start_row: int):
@@ -215,11 +238,17 @@ class SignalsListView(Frame):
             for widget in widgets:
                 widget.grid_forget()
     
-    def send_form_data(self):
+    def processing_form_data(self):
         form_data = {
             key: {key:subvalue.get() for key, subvalue in value.items()} if isinstance(value, dict) else value.get()
             for key, value in self.form_data.items()
         }
-        print(form_data)
-        serialized_data = SignalsListSubdataSerializer(**form_data)
-        print(serialized_data)
+        serialized_data = SignalsListDataSerializer(**form_data)
+        try:
+            self.report_service.generate_report(serialized_data.model_dump())
+        except Exception as error:
+            print(error)
+        
+        path = filedialog.askdirectory()
+        self.report_service.save(path)
+    
